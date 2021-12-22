@@ -65,19 +65,6 @@
   :type 'boolean
   :group 'openapi-yaml)
 
-(defconst openapi-yaml-mode--syntax-table
-  (let ((table (make-syntax-table)))
-
-    (modify-syntax-entry ?' "." table)
-
-    (modify-syntax-entry ?\" "." table)
-
-    (set (make-local-variable 'indent-line-function) 'yaml-indent-line)
-    (set (make-local-variable 'indent-tabs-mode) nil)
-    (set (make-local-variable 'fill-paragraph-function) 'yaml-fill-paragraph)
-
-    table))
-
 ;; Source : https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md
 (defconst openapi-yaml-mode--openapi-keywords
   '(;; Literals
@@ -509,8 +496,6 @@
 
   (unless openapi-yaml-use-yaml-mode-syntax-highlight
     (progn
-      (set-syntax-table openapi-yaml-mode--syntax-table)
-
       (set (make-local-variable 'font-lock-defaults)
            (if (openapi-yaml-mode-detect-openapi2)
                '(openapi-yaml-mode--font-lock-keywords-for-openapi nil nil)
@@ -526,6 +511,7 @@
   (and
    (or (string-suffix-p ".yaml" (buffer-name))
        (string-suffix-p ".yml" (buffer-name)))
+   (> (buffer-size) 0)
    (string-match
     "\\(.\\|\n\\)*\\([[:space:]]\\|\"\\|\\'\\)*swagger\\([[:space:]]\\|\"\\|\\'\\)*:[[:space:]]*[\"\\']2.0[\"\\'].*"
     ;; Need to avoid stack overflow for multi-line regex
@@ -537,6 +523,7 @@
   (and
    (or (string-suffix-p ".yaml" (buffer-name))
        (string-suffix-p ".yml" (buffer-name)))
+   (> (buffer-size) 0)
    (string-match
     "\\(.\\|\n\\)*\\([[:space:]]\\|\"\\|\\'\\)*openapi\\([[:space:]]\\|\"\\|\\'\\)*:[[:space:]]*[\"\\']?3.0.0[\"\\']?.*"
     ;; Need to avoid stack overflow for multi-line regex
